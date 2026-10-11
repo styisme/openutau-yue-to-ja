@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 # YueToJapanesePhonemizer
 
@@ -18,7 +18,7 @@
 
 ## ✨ 特性
 
-- **粤拼音系** —— 完整支持 Jyutping 声母、韵母、声调
+- **粤语音系** —— 完整支持 Jyutping 声母、韵母、声调
   - 19 个声母（含 `ng` / `gw` / `kw`）
   - 50+ 个韵母（含 `aa` / `oeng` / `eoi` / `eon` 等粤语特有声韵）
   - 入声韵尾 `-p` / `-t` / `-k`

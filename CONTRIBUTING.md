@@ -1,4 +1,4 @@
-# 贡献指南
+﻿# 贡献指南
 
 感谢参与 YueToJapanesePhonemizer 的开发！本项目采用轻量但明确的源代码管理规范：Conventional Commits + SemVer 2.0.0 + CHANGELOG，CI 全自动验证。
 
@@ -50,7 +50,7 @@ dotnet test openutau-yue-to-ja.slnx
 | `fix` | 缺陷修复 | `fix: 修复 nasal_mode=none 不生效` |
 | `docs` | 文档 | `docs: 更新 README 安装说明` |
 | `refactor` | 重构（不改行为） | `refactor: 重构 FullJyutpingMap` |
-| `test` | 测试 | `test: 补充拼音解析用例` |
+| `test` | 测试 | `test: 补充粤拼解析用例` |
 | `ci` | CI/CD | `ci: 流水线加入安装包编译` |
 | `build` | 构建脚本 | `build: 更新 build.ps1` |
 | `perf` | 性能 | `perf: 缓存 Oto 查询` |
@@ -70,7 +70,7 @@ dotnet test openutau-yue-to-ja.slnx
 |---|---|---|
 | **MAJOR** | 不兼容的公共行为变更 | 删除 YAML 配置键、改变默认音素输出、提高 OpenUtau/.NET 最低版本要求 |
 | **MINOR** | 向后兼容的新功能 | 新增 `use_wildcard` 等配置项、新增音源支持 |
-| **PATCH** | 向后兼容的修复 | 修复拼音映射、修复 bug |
+| **PATCH** | 向后兼容的修复 | 修复粤拼映射、修复 bug |
 
 预发布：`2.2.0-beta.1`；Git tag：`v2.2.0`。
 
