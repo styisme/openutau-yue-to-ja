@@ -38,6 +38,10 @@
     <Reference Include="YamlDotNet">
       <HintPath>YamlDotNet.dll</HintPath>
       <Private>false</Private>
+    <Reference Include="Pinyin">
+      <HintPath>Pinyin.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     </Reference>
   </ItemGroup>
 </Project>

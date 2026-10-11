@@ -24,6 +24,10 @@
       <HintPath>..\..\src\YueToJapanesePhonemizer\YamlDotNet.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="Pinyin">
+      <HintPath>..\..\src\YueToJapanesePhonemizer\Pinyin.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
 
   <!-- Runtime dependencies (fetched by build/fetch-deps.ps1) -->

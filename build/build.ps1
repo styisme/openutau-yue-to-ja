@@ -64,10 +64,13 @@ try {
 Write-Info "Checking required files..."
 
 $requiredCs = Join-Path $srcDir "YueToJapanesePhonemizer.cs"
-$requiredDlls = @(
+$RequiredDlls = @(
     "OpenUtau.Core.dll",
     "OpenUtau.Plugin.Builtin.dll",
-    "WanaKanaNet.dll"
+    "WanaKanaNet.dll",
+    "Serilog.dll",
+    "YamlDotNet.dll",
+    "Pinyin.dll"
 )
 
 $missing = @()

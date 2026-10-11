@@ -38,7 +38,8 @@ $RequiredDlls = @(
     "OpenUtau.Plugin.Builtin.dll",
     "WanaKanaNet.dll",
     "Serilog.dll",
-    "YamlDotNet.dll"
+    "YamlDotNet.dll",
+    "Pinyin.dll"
 )
 
 # NuGet fallback (package id -> file name inside the nupkg)
