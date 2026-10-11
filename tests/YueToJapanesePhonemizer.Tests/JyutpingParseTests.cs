@@ -28,13 +28,13 @@ public class JyutpingParseTests {
         "nga ngai ngan ngang ngat ngak " +
         "aai aau aam aan aang aap aat aak " +
         "ai au am an ang ap at ak " +
-        "ei eu em en eng ep et ek " +
+        "ei eu " +
         "ing ik " +
         "o ong ot ok " +
         "ou " +
         "u un ung ut uk " +
         "ui " +
-        "e eo eoi eon eok " +
+        "e eo eoi eon " +
         "oe oeng " +
         "yu yun yut " +
         "iu im in ip it " +

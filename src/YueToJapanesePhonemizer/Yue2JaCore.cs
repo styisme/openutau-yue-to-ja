@@ -71,6 +71,7 @@ namespace OpenUtau.Plugin.Builtin {
             "on", "ong", "ot", "ok",
             "un", "ut", "uk",
             "oe", "eo", "yu", "ng",
+            "am", "an", "ang", "ap", "at", "ak",
             "a", "e", "i", "o", "u", "m"
         };
 
@@ -119,13 +120,14 @@ namespace OpenUtau.Plugin.Builtin {
             int i = 0;
             while (i < s.Length) {
                 var dm = DateRegex.Match(s, i);
-                if (dm.Success && dm.Index == i) { sb.Append(ReadDate(dm)); i += dm.Length; continue; }
+                if (dm.Success && dm.Index == i) { sb.Append(' ').Append(ReadDate(dm)).Append(' '); i += dm.Length; continue; }
                 var tm = TimeRegex.Match(s, i);
-                if (tm.Success && tm.Index == i) { sb.Append(ReadTime(tm)); i += tm.Length; continue; }
-                if (char.IsDigit(s[i])) { sb.Append(ReadNumberChunk(s, ref i)); continue; }
+                if (tm.Success && tm.Index == i) { sb.Append(' ').Append(ReadTime(tm)).Append(' '); i += tm.Length; continue; }
+                if (char.IsDigit(s[i])) { sb.Append(' ').Append(ReadNumberChunk(s, ref i)).Append(' '); continue; }
                 sb.Append(s[i]); i++;
             }
-            return sb.ToString().Trim();
+            var result = System.Text.RegularExpressions.Regex.Replace(sb.ToString(), @"\s+", " ");
+            return result.Trim();
         }
 
         private static string ReadNumberChunk(string s, ref int i) {
@@ -232,6 +234,7 @@ namespace OpenUtau.Plugin.Builtin {
             if (digits.Count == 1) return DigitJyutping[digits[0]];
             long num = 0;
             foreach (var d in digits) num = num * 10 + d;
+            if (num == 0) return string.Join(" ", digits.Select(d => DigitJyutping[d]));
             if (num == 10) return "sap";
             if (num < 20) return "sap " + DigitJyutping[num - 10];
             if (num < 100) {

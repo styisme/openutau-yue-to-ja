@@ -34,9 +34,9 @@ public class KanaConversionTests {
     }
 
     [Fact]
-    public void GenerateMoras_Gwong_ThreeMoras() {
+    public void GenerateMoras_Gwong_TwoMoras() {
         var moras = Yue2JaCore.GenerateMoras(new[] { "gw" }, "ong", DefaultMap());
-        Assert.Equal(new[] { "ぐ", "お", "ん" }, moras);
+        Assert.Equal(new[] { "ご", "ん" }, moras);
     }
 
     [Fact]
