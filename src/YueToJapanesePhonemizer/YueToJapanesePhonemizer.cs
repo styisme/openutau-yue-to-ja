@@ -55,7 +55,7 @@ namespace OpenUtau.Plugin.Builtin {
         public bool UseWildcard { get; set; } = true;
     }
 
-    [Phonemizer("Cantonese to Japanese Phonemizer", "YUE to JA", "Deepseek", language: "ZH")]
+    [Phonemizer("Cantonese to Japanese Phonemizer", "YUE to JA", "Deepseek", language: "ZH-YUE")]
     public class YueToJapanesePhonemizer : SyllableBasedPhonemizer {
 
         private readonly Dictionary<string, string[]> fullJyutpingMap = new();
