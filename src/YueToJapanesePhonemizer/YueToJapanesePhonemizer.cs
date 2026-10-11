@@ -142,7 +142,7 @@ namespace OpenUtau.Plugin.Builtin {
             noteTones.Clear();
             lightToneFlags.Clear();
             PreprocessNotes(groups);
-            BaseChinesePhonemizer.RomanizeNotes(groups);
+            #BaseChinesePhonemizer.RomanizeNotes(groups);
             FixPolyphones(groups);
             base.SetUp(groups, project, track);
         }
