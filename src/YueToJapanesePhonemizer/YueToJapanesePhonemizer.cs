@@ -14,6 +14,7 @@ using OpenUtau.Api;
 using OpenUtau.Core.Ustx;
 using Serilog;
 using YamlDotNet.Serialization;
+using Pinyin;
 
 namespace OpenUtau.Plugin.Builtin {
 
@@ -141,9 +142,63 @@ namespace OpenUtau.Plugin.Builtin {
         public override void SetUp(Note[][] groups, UProject project, UTrack track) {
             noteTones.Clear();
             lightToneFlags.Clear();
+            RomanizeHanziToJyutping(groups);
             PreprocessNotes(groups);
             FixPolyphones(groups);
             base.SetUp(groups, project, track);
+        }
+        /// <summary>
+        /// 把汉字歌词转成粤拼（用 OpenUtau 内置 Pinyin.Jyutping 库）。
+        /// </summary>
+        private static void RomanizeHanziToJyutping(Note[][] groups) {
+            if (groups == null || groups.Length == 0) return;
+
+            var positions = new List<int>();
+            var targets = new List<string>();
+
+            for (int i = 0; i < groups.Length; i++) {
+                if (groups[i] == null || groups[i].Length == 0) continue;
+                var note = groups[i][0];
+                string l = note.lyric;
+                if (string.IsNullOrEmpty(l)) continue;
+
+                string trimmed = l.Trim();
+                if (trimmed == "-" || trimmed == "R" || trimmed == "+") continue;
+                if (trimmed.Length != 1) continue;
+                if (!Pinyin.Jyutping.Instance.IsHanzi(trimmed)) continue;
+
+                positions.Add(i);
+                targets.Add(trimmed);
+            }
+
+            if (targets.Count == 0) return;
+
+            List<string> converted;
+            try {
+                converted = Pinyin.Jyutping.Instance
+                    .HanziToPinyin(targets, CanTone.Style.NORMAL, Pinyin.Error.Default)
+                    .ToStrList();
+            } catch (Exception e) {
+                Log.Warning(e, "[YUE to JA] HanziToPinyin 失败，跳过汉字转换");
+                return;
+            }
+
+            if (converted == null || converted.Count != positions.Count) return;
+
+            for (int k = 0; k < positions.Count; k++) {
+                int gi = positions[k];
+                var oldNote = groups[gi][0];
+                groups[gi][0] = new Note {
+                    lyric = converted[k],
+                    phoneticHint = oldNote.phoneticHint,
+                    tone = oldNote.tone,
+                    position = oldNote.position,
+                    duration = oldNote.duration,
+                    phonemeAttributes = oldNote.phonemeAttributes,
+                };
+            }
+
+            Log.Information($"[YUE to JA] 汉字转粤拼: {targets.Count} 个");
         }
 
         private void PreprocessNotes(Note[][] groups) {
