@@ -5,8 +5,11 @@ namespace YueToJapanesePhonemizer.Tests;
 
 public class JyutpingParseTests {
     private static readonly string[] StandardSyllables = (
+        // 常用字
         "nei hou zou san nin fai lok do ze " +
+        // 数字
         "jat ji saam sei ng luk cat baat gau sap " +
+        // 长 a 系列
         "baa baai baau baam baan baang baap baat baak " +
         "paa paai paau paam paan paang paap paat paak " +
         "maa maai maau maam maan maang maap maat maak " +
@@ -26,15 +29,16 @@ public class JyutpingParseTests {
         "gwai gwan gwang gwat gwok " +
         "kwai kwan kwang kwat kwok " +
         "nga ngai ngan ngang ngat ngak " +
+        // 韵母独立（无辅音）
         "aai aau aam aan aang aap aat aak " +
         "ai au am an ang ap at ak " +
-        "ei eu " +
+        "ei eu em en eng ep et ek " +
         "ing ik " +
-        "o ong ot ok " +
+        "o oi ong ot ok " +
         "ou " +
         "u un ung ut uk " +
         "ui " +
-        "e eo eoi eon " +
+        "e eo eoi eon eot " +
         "oe oeng " +
         "yu yun yut " +
         "iu im in ip it " +

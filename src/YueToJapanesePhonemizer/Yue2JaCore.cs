@@ -48,6 +48,7 @@ namespace OpenUtau.Plugin.Builtin {
             { "ja", "じゃ" }, { "ji", "じ" }, { "ju", "じゅ" }, { "je", "じぇ" }, { "jo", "じょ" },
             { "sa", "さ" }, { "si", "し" }, { "su", "す" }, { "se", "せ" }, { "so", "そ" },
             { "sha", "しゃ" }, { "shi", "し" }, { "shu", "しゅ" }, { "she", "しぇ" }, { "sho", "しょ" },
+            { "shyu", "しゅ" }, { "chyu", "ちゅ" }, { "jyu", "じゅ" }, { "yyu", "ゆ" },
             { "tsa", "つぁ" }, { "tsi", "つぃ" }, { "tsu", "つ" }, { "tse", "つぇ" }, { "tso", "つぉ" },
             { "cha", "ちゃ" }, { "chi", "ち" }, { "chu", "ちゅ" }, { "che", "ちぇ" }, { "cho", "ちょ" },
             { "ya", "や" }, { "yu", "ゆ" }, { "ye", "いぇ" }, { "yo", "よ" },
@@ -365,10 +366,12 @@ namespace OpenUtau.Plugin.Builtin {
                 case "iu":  return new List<string> { "i", "u" };
                 case "ui":  return new List<string> { "u", "i" };
                 // 鼻音韵尾
-                case "aam": case "am": case "em":
-                case "aan": case "an": case "en":
-                case "aang": case "ang": case "eng":
+                case "aam": case "am":
+                case "aan": case "an":
+                case "aang": case "ang":
                     return new List<string> { "a", "N" };
+                case "em": case "en": case "eng":
+                    return new List<string> { "e", "N" };
                 case "im": case "in": case "ing":
                     return new List<string> { "i", "N" };
                 case "on": case "ong":
