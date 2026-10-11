@@ -23,6 +23,7 @@ namespace OpenUtau.Plugin.Builtin {
         internal static readonly Dictionary<string, string> RomajiToKana = new() {
             { "a", "あ" }, { "i", "い" }, { "u", "う" }, { "e", "え" }, { "o", "お" },
             { "n", "ん" }, { "N", "ん" },
+            { "yi", "い" },
             { "ba", "ば" }, { "bi", "び" }, { "bu", "ぶ" }, { "be", "べ" }, { "bo", "ぼ" },
             { "bya", "びゃ" }, { "byu", "びゅ" }, { "byo", "びょ" },
             { "pa", "ぱ" }, { "pi", "ぴ" }, { "pu", "ぷ" }, { "pe", "ぺ" }, { "po", "ぽ" },
@@ -80,7 +81,7 @@ namespace OpenUtau.Plugin.Builtin {
             { "d", "d" }, { "t", "t" }, { "n", "n" }, { "l", "r" },
             { "g", "g" }, { "k", "k" }, { "h", "h" }, { "ng", "g" },
             { "gw", "g" }, { "kw", "k" }, { "w", "w" },
-            { "z", "j" }, { "c", "ch" }, { "s", "sh" }, { "j", "y" },
+            { "z", "j" }, { "c", "ch" }, { "s", "s" }, { "j", "y" },
         };
 
         internal static readonly HashSet<string> LightToneChars = new();
