@@ -1,0 +1,25 @@
+# 构建产物
+bin/
+obj/
+build/dist/
+
+# 依赖 DLL（由 build/fetch-deps.ps1 下载，不纳入版本管理）
+src/YueToJapanesePhonemizer/*.dll
+tests/YueToJapanesePhonemizer.Tests/*.dll
+
+# 本地归档（历史 DLL / 安装包 / docx，不入库）
+local-archive/
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+
+# 系统
+Thumbs.db
+.DS_Store
+
+# 临时
+*.tmp
+*.log

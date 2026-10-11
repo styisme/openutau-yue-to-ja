@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve OpenUtau dependency version
+        id: openutau
+        shell: pwsh
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          $headers = @{ "User-Agent" = "openutau-yue-to-ja-ci" }
+          $releases = Invoke-RestMethod -Headers $headers `
+            -Uri "https://api.github.com/repos/stakira/OpenUtau/releases?per_page=10"
+          $release = $releases | Where-Object {
+            $_.assets | Where-Object { $_.name -eq "OpenUtau-win-x64.zip" }
+          } | Select-Object -First 1
+          if (-not $release) { throw "No OpenUtau release with OpenUtau-win-x64.zip found" }
+          "tag=$($release.tag_name)" >> $env:GITHUB_OUTPUT
+          Write-Host "OpenUtau release: $($release.tag_name)"
+
+      - name: Cache dependency DLLs
+        uses: actions/cache@v4
+        with:
+          path: src/YueToJapanesePhonemizer/*.dll
+          key: openutau-deps-${{ runner.os }}-${{ steps.openutau.outputs.tag }}
+
+      - name: Fetch build dependencies
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File build/fetch-deps.ps1
+
+      - name: Build
+        run: dotnet build openutau-yue-to-ja.slnx -c Release
+
+      - name: Test
+        run: dotnet test openutau-yue-to-ja.slnx -c Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/**
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Build installer (Inno Setup)
+        shell: pwsh
+        run: |
+          $cl = Join-Path (Get-Location).Path "CHANGELOG.md"
+          if (-not (Test-Path $cl)) {
+              Write-Error "找不到 CHANGELOG.md: $cl"
+              exit 1
+          }
+
+          $line = Get-Content -Path $cl -Encoding UTF8 |
+                  Where-Object { $_ -match '^\s*##\s*\[Latest\]\s+v?(\S+)' } |
+                  Select-Object -First 1
+
+          if (-not $line) {
+              Write-Error "未在 CHANGELOG.md 中找到 '## [Latest]' 开头的行"
+              exit 1
+          }
+
+          if ($line -notmatch '^\s*##\s*\[Latest\]\s+v?(\S+)') {
+              Write-Error "无法从行中解析出版本号: $line"
+              exit 1
+          }
+          $version = $Matches[1]
+
+          # 简单校验 SemVer 格式（可留可去）
+          if ($version -notmatch '^\d+\.\d+\.\d+') {
+              Write-Error "解析出的版本号格式可疑: $version"
+              exit 1
+          }
+
+          Write-Host "Version: $version"
+
+          $candidates = @(
+            "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+            "$env:ProgramFiles\Inno Setup 6\ISCC.exe"
+          )
+          $iscc = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $iscc) {
+            Write-Error "未找到 Inno Setup 6 (ISCC.exe)"
+            exit 1
+          }
+
+          $innoDir = Split-Path $iscc
+          $isl = Join-Path $innoDir "Languages\ChineseSimplified.isl"
+          if (-not (Test-Path $isl)) {
+            Write-Host "ChineseSimplified.isl missing, downloading from issrc..."
+            New-Item -ItemType Directory -Force -Path (Split-Path $isl) | Out-Null
+            Invoke-WebRequest -UseBasicParsing -TimeoutSec 60 `
+              -Uri "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/ChineseSimplified.isl" `
+              -OutFile $isl
+          }
+
+          & $iscc "/DMyAppVersion=$version" build\installer.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed with exit code $LASTEXITCODE" }
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer
+          path: build/dist/*.exe
+          retention-days: 90
+
+      - name: Upload plugin DLL artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-dll
+          path: src/YueToJapanesePhonemizer/bin/Release/net10.0/MyYUtoJAPlugin.dll
+          retention-days: 90

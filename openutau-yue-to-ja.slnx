@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/YueToJapanesePhonemizer/">
+    <Project Path="src/YueToJapanesePhonemizer/MyYUtoJAPlugin.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/YueToJapanesePhonemizer.Tests/YueToJapanesePhonemizer.Tests.csproj" />
+  </Folder>
+</Solution>
