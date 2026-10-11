@@ -22,8 +22,7 @@ namespace OpenUtau.Plugin.Builtin {
 
         internal static readonly Dictionary<string, string> RomajiToKana = new() {
             { "a", "あ" }, { "i", "い" }, { "u", "う" }, { "e", "え" }, { "o", "お" },
-            { "n", "ん" }, { "N", "ん" },
-            { "yi", "い" },
+            { "n", "ん" }, { "N", "ん" }, { "yi", "い" },
             { "ba", "ば" }, { "bi", "び" }, { "bu", "ぶ" }, { "be", "べ" }, { "bo", "ぼ" },
             { "bya", "びゃ" }, { "byu", "びゅ" }, { "byo", "びょ" },
             { "pa", "ぱ" }, { "pi", "ぴ" }, { "pu", "ぷ" }, { "pe", "ぺ" }, { "po", "ぽ" },
@@ -63,16 +62,20 @@ namespace OpenUtau.Plugin.Builtin {
         };
 
         internal static readonly string[] Finals = {
+            // 3+ 字符
             "aang", "oeng",
             "aai", "aau", "aam", "aan", "aap", "aat", "aak",
-            "eoi", "eon", "oek",
+            "eoi", "eon", "eot", "oek",
             "ing", "ung", "yun", "yut",
-            "aa", "ai", "au", "ei", "eu", "ou", "iu", "ui",
+            "em", "en", "eng", "ep", "et", "ek",
+            // 2 字符
+            "aa", "ai", "au", "ei", "eu", "ou", "oi", "iu", "ui",
             "im", "in", "ip", "it", "ik",
             "on", "ong", "ot", "ok",
             "un", "ut", "uk",
             "oe", "eo", "yu", "ng",
             "am", "an", "ang", "ap", "at", "ak",
+            // 1 字符
             "a", "e", "i", "o", "u", "m"
         };
 
@@ -81,7 +84,7 @@ namespace OpenUtau.Plugin.Builtin {
             { "d", "d" }, { "t", "t" }, { "n", "n" }, { "l", "r" },
             { "g", "g" }, { "k", "k" }, { "h", "h" }, { "ng", "g" },
             { "gw", "g" }, { "kw", "k" }, { "w", "w" },
-            { "z", "j" }, { "c", "ch" }, { "s", "s" }, { "j", "y" },
+            { "z", "j" }, { "c", "ch" }, { "s", "sh" }, { "j", "y" },
         };
 
         internal static readonly HashSet<string> LightToneChars = new();
@@ -106,6 +109,9 @@ namespace OpenUtau.Plugin.Builtin {
             "ling", "jat", "ji", "saam", "sei", "ng", "luk", "cat", "baat", "gau"
         };
 
+        // ------------------------------------------------------------
+        // 文本处理
+        // ------------------------------------------------------------
         internal static string ReplacePunctuation(string s) {
             var sb = new StringBuilder(s.Length);
             foreach (char c in s) {
@@ -121,13 +127,25 @@ namespace OpenUtau.Plugin.Builtin {
             int i = 0;
             while (i < s.Length) {
                 var dm = DateRegex.Match(s, i);
-                if (dm.Success && dm.Index == i) { sb.Append(' ').Append(ReadDate(dm)).Append(' '); i += dm.Length; continue; }
+                if (dm.Success && dm.Index == i) {
+                    sb.Append(' ').Append(ReadDate(dm)).Append(' ');
+                    i += dm.Length;
+                    continue;
+                }
                 var tm = TimeRegex.Match(s, i);
-                if (tm.Success && tm.Index == i) { sb.Append(' ').Append(ReadTime(tm)).Append(' '); i += tm.Length; continue; }
-                if (char.IsDigit(s[i])) { sb.Append(' ').Append(ReadNumberChunk(s, ref i)).Append(' '); continue; }
-                sb.Append(s[i]); i++;
+                if (tm.Success && tm.Index == i) {
+                    sb.Append(' ').Append(ReadTime(tm)).Append(' ');
+                    i += tm.Length;
+                    continue;
+                }
+                if (char.IsDigit(s[i])) {
+                    sb.Append(' ').Append(ReadNumberChunk(s, ref i)).Append(' ');
+                    continue;
+                }
+                sb.Append(s[i]);
+                i++;
             }
-            var result = System.Text.RegularExpressions.Regex.Replace(sb.ToString(), @"\s+", " ");
+            var result = Regex.Replace(sb.ToString(), @"\s+", " ");
             return result.Trim();
         }
 
@@ -232,6 +250,7 @@ namespace OpenUtau.Plugin.Builtin {
             ConvertDigitSequence(digits.Where(char.IsDigit).Select(c => c - '0').ToList());
 
         internal static string ConvertDigitSequence(List<int> digits) {
+            if (digits.Count == 0) return "";
             if (digits.Count == 1) return DigitJyutping[digits[0]];
             long num = 0;
             foreach (var d in digits) num = num * 10 + d;
@@ -262,6 +281,9 @@ namespace OpenUtau.Plugin.Builtin {
             return false;
         }
 
+        // ------------------------------------------------------------
+        // 粤拼解析
+        // ------------------------------------------------------------
         internal static string[] ParseJyutping(string jyutping) {
             jyutping = new string(jyutping.Where(c => c >= 'a' && c <= 'z').ToArray()).ToLowerInvariant();
             if (string.IsNullOrEmpty(jyutping)) return null;
@@ -279,6 +301,9 @@ namespace OpenUtau.Plugin.Builtin {
             return null;
         }
 
+        // ------------------------------------------------------------
+        // 假名转换
+        // ------------------------------------------------------------
         internal static List<string> GenerateMoras(string[] cc, string final,
             Dictionary<string, string[]> fullMap) {
             var moras = new List<string>();
@@ -316,6 +341,7 @@ namespace OpenUtau.Plugin.Builtin {
 
         internal static List<string> GetJapaneseVowelSequence(string final) {
             switch (final) {
+                // 单元音
                 case "aa": return new List<string> { "a" };
                 case "a":  return new List<string> { "a" };
                 case "e":  return new List<string> { "e" };
@@ -325,6 +351,7 @@ namespace OpenUtau.Plugin.Builtin {
                 case "yu": return new List<string> { "yu" };
                 case "oe": return new List<string> { "e" };
                 case "eo": return new List<string> { "o" };
+                // 复元音
                 case "aai": return new List<string> { "a", "i" };
                 case "aau": return new List<string> { "a", "u" };
                 case "ai":  return new List<string> { "a", "i" };
@@ -332,12 +359,15 @@ namespace OpenUtau.Plugin.Builtin {
                 case "ei":  return new List<string> { "e", "i" };
                 case "eu":  return new List<string> { "e", "u" };
                 case "eoi": return new List<string> { "e", "o", "i" };
+                case "eot": return new List<string> { "e", "o" };
                 case "ou":  return new List<string> { "o", "u" };
+                case "oi":  return new List<string> { "o", "i" };
                 case "iu":  return new List<string> { "i", "u" };
                 case "ui":  return new List<string> { "u", "i" };
-                case "aam": case "am":
-                case "aan": case "an":
-                case "aang": case "ang":
+                // 鼻音韵尾
+                case "aam": case "am": case "em":
+                case "aan": case "an": case "en":
+                case "aang": case "ang": case "eng":
                     return new List<string> { "a", "N" };
                 case "im": case "in": case "ing":
                     return new List<string> { "i", "N" };
@@ -353,6 +383,7 @@ namespace OpenUtau.Plugin.Builtin {
                     return new List<string> { "yu", "N" };
                 case "m": case "ng":
                     return new List<string> { "N" };
+                // 入声韵尾（日语无塞音尾，丢弃）
                 case "aap": case "ap":
                 case "aat": case "at":
                 case "aak": case "ak":
@@ -367,6 +398,8 @@ namespace OpenUtau.Plugin.Builtin {
                     return new List<string> { "e" };
                 case "yut":
                     return new List<string> { "yu" };
+                case "ep": case "et": case "ek":
+                    return new List<string> { "e" };
                 default:
                     return new List<string> { final };
             }
